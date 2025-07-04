@@ -16,7 +16,7 @@
 
 #define MQTT_TOPIC_SUB "subTopic"
 #define MQTT_TOPIC_PUB "pubTopic"
-#define TASK_INIT_TIME 8 // s
+#define TASK_INIT_TIME 1 // s
 #define MQTT_RECV_TASK_TIME (200 * 1000) // us
 
 

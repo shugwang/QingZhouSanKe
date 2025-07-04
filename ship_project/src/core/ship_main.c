@@ -28,9 +28,9 @@ int8_t mqtt_sub_payload_callback(unsigned char *topic, unsigned char *payload)
     COMMAND cmd;
     sscanf(payload , "%d %d %d %d", &cmd.task_id, &cmd.func_id, &cmd.data_1, &cmd.data_2);
     if(cmd.task_id<CONSUMERS_NUM && cmd.task_id>=0){
-        if(CMD_FIFO_PUSH(&CMD_Q[cmd.task_id],&cmd)){
-            printf("push cmd: %x %x %x %x \r\n",cmd.task_id, cmd.func_id, cmd.data_1, cmd.data_2 );
-        }
+        // if(CMD_FIFO_PUSH(&CMD_Q[cmd.task_id],&cmd)){
+        //     printf("push cmd: %x %x %x %x \r\n",cmd.task_id, cmd.func_id, cmd.data_1, cmd.data_2 );
+        // }
     }
 }
 

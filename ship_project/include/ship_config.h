@@ -4,7 +4,9 @@
 // MQTT指令设计
 typedef enum {
     DRIVE_ID=0,
-    PUMP_ID
+    PUMP_ID,
+    MQTT_PUB_ID,
+    CMD_TASK_ID_MAX
 }CMD_TASK_ID;
 
 // MQTT 网络连接

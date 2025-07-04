@@ -1,6 +1,6 @@
 
 #include "mqtt_task.h"
-
+#include "cmd_fifo.h"
 
 osThreadId_t mqtt_send_Task3_id;   // mqtt订阅数据任务
 osThreadId_t mqtt_recv_Task4_id;   // mqtt发布数据任务
@@ -38,7 +38,7 @@ void mqtt_send_task(void)
     {
         printf("[success] MQTTClient_connectServer\r\n");
     }
-    sleep(1);
+    sleep(TASK_INIT_TIME);
 
     // 初始化MQTT客户端
     if (MQTTClient_init("mqtt_client_123", "username", "password") != 0) 
@@ -85,8 +85,16 @@ void mqtt_send_task(void)
 
     while (1) 
     {
-        MQTTClient_pub(MQTT_TOPIC_PUB, "hello world!!!", strlen("hello world!!!"));
-        sleep(TASK_INIT_TIME);
+        COMMAND cmd;
+        CMD_FIFO * fifo_p;
+        fifo_p = &CMD_Q[MQTT_PUB_ID];
+        if( CMD_FIFO_POP(fifo_p, &cmd) ){
+            printf("mqtt_pub_task pop cmd: %x %x %x %x \r\n",cmd.task_id, cmd.func_id, cmd.data_1, cmd.data_2 );
+            if( cmd.func_id == 0x01){ //上传传感器信息
+                MQTTClient_pub(MQTT_TOPIC_PUB, "hello world!!!", strlen("hello world!!!"));
+            }
+        }
+        usleep(1000*1000);
     }
 }
 
