@@ -10,6 +10,11 @@ typedef enum {
     CMD_TASK_ID_MAX
 }CMD_TASK_ID;
 
+#define MQON0          16              //MsgQueueObjectNumber
+#define MQON1          4
+#define MQON2          4
+#define MESSAGE_TIMEOUT 100
+
 // MQTT 网络连接
 #define WIFI_SSID "Xiami 13"
 #define WIFI_PAWD "12345678"

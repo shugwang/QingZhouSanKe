@@ -2,27 +2,37 @@
 #include "cmd_fifo.h"
 
 osThreadId_t pump_Task2_ID;
+
+#ifdef CMD_FIFO_QD
 extern CMD_FIFO CMD_Q[CONSUMERS_NUM];
+#else
+extern osMessageQueueId_t MsgQueue_ID1;
+#endif
 
 void pump_Task(void)
 {
     pump_init();
     COMMAND cmd;
+    #ifdef CMD_FIFO_QD
     CMD_FIFO * fifo_p;
     fifo_p = &CMD_Q[PUMP_ID];
     while(1){
         if( CMD_FIFO_POP(&CMD_Q[PUMP_ID], &cmd) ){
+    #else
+    while(1){
+        if( osMessageQueueGet(MsgQueue_ID1, &cmd, 0, MESSAGE_TIMEOUT) == osOK ){
+    #endif
             printf("pump_task pop cmd: %x %x %x %x \r\n",cmd.task_id, cmd.func_id, cmd.data_1, cmd.data_2 );
             if( cmd.func_id == 0x01){ 
-                printf(" 开始汲水\r\n ");
+                printf(" start pump water\r\n ");
                 pump_water();
             }
             else if( cmd.func_id == 0x02 ){
-                printf(" 开始排水\r\n ");
+                printf(" start drain water\r\n ");
                 drain_water();
             }
             else if( cmd.func_id == 0x03 ){
-                printf(" 停止水泵\r\n ");
+                printf(" stop pump\r\n ");
                 stop_pump();
             }
         }

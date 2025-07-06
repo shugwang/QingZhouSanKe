@@ -19,6 +19,7 @@ typedef struct
     char data_2;
 }COMMAND;
 
+//以下方案存在问题。系统调度时会使mqtt的system panic
 typedef struct {
     COMMAND cmd[FIFO_SIZE];
     uint8_t head;

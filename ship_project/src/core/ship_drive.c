@@ -3,16 +3,24 @@
 #include "cmd_fifo.h"
 
 osThreadId_t move_Task1_ID; 
+#ifdef CMD_FIFO_QD
 extern CMD_FIFO CMD_Q[CONSUMERS_NUM];
-
+#else
+extern osMessageQueueId_t MsgQueue_ID0;
+#endif
 void MOVE_Task(void)
 {
     motor_init();//电机控制模块 初始化
     COMMAND cmd;
+    #ifdef CMD_FIFO_QD
     CMD_FIFO * fifo_p;
     fifo_p = &CMD_Q[DRIVE_ID];
     while(1) {
         if( CMD_FIFO_POP(fifo_p, &cmd) ){
+    #else
+    while(1) {
+        if( osMessageQueueGet(MsgQueue_ID0, &cmd, 0, MESSAGE_TIMEOUT) == osOK ){
+    #endif
             printf("drive_task pop cmd: %x %x %x %x \r\n",cmd.task_id, cmd.func_id, cmd.data_1, cmd.data_2 );
             if( cmd.func_id == 0x01){ //设置两个电机的转速
                 set_motor_speed(1,cmd.data_1);

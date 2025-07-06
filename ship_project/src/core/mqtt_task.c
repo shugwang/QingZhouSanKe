@@ -2,7 +2,11 @@
 #include "mqtt_task.h"
 #include "cmd_fifo.h"
 
+#ifdef CMD_FIFO_QD
 extern CMD_FIFO CMD_Q[CONSUMERS_NUM];
+#else
+extern osMessageQueueId_t MsgQueue_ID2;
+#endif
 
 osThreadId_t mqtt_send_Task3_id;   // mqtt订阅数据任务
 osThreadId_t mqtt_recv_Task4_id;   // mqtt发布数据任务
@@ -88,9 +92,13 @@ void mqtt_send_task(void)
     while (1) 
     {
         COMMAND cmd;
+        #ifdef CMD_FIFO_QD
         CMD_FIFO * fifo_p;
         fifo_p = &CMD_Q[MQTT_PUB_ID];
         if( CMD_FIFO_POP(fifo_p, &cmd) ){
+        #else
+        if( osMessageQueueGet(MsgQueue_ID2, &cmd, 0, MESSAGE_TIMEOUT) == osOK ){
+        #endif
             printf("mqtt_pub_task pop cmd: %x %x %x %x \r\n",cmd.task_id, cmd.func_id, cmd.data_1, cmd.data_2 );
             if( cmd.func_id == 0x01){ //上传传感器信息
                 MQTTClient_pub(MQTT_TOPIC_PUB, "hello world!!!", strlen("hello world!!!"));
