@@ -6,9 +6,9 @@
 #include "cmsis_os2.h"
 
 // 指令fifo的数据结构
-#define FIFO_SIZE 64       // 每个消费者的FIFO大小（可根据需要调整）
+#define FIFO_SIZE 8       // 每个消费者的FIFO大小（可根据需要调整）
 #define CMD_LENGTH 4       // 指令长度
-#define MUX_TIME_OUT 0    // 非阻塞申请
+#define MUX_TIME_OUT osWaitForever    
 #define CONSUMERS_NUM CMD_TASK_ID_MAX    // 消费者数量
 
 typedef struct

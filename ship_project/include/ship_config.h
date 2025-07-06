@@ -6,6 +6,7 @@ typedef enum {
     DRIVE_ID=0,
     PUMP_ID,
     MQTT_PUB_ID,
+    
     CMD_TASK_ID_MAX
 }CMD_TASK_ID;
 
@@ -16,6 +17,17 @@ typedef enum {
 #define SERVER_IP_ADDR "44.249.200.171"    //broker.emqx.io
 #define SERVER_IP_PORT 1883
 
+// 传感器引脚分配
+#define pH_PIN HI_IO_NAME_GPIO_12            // pH计模拟输入引脚(根据实际接线调整)
+#define pH_OFFSET 0.00f                      // 校准偏移量, ≤0.3
+#define pH_ADC_CHANNEL  HI_ADC_CHANNEL_0
+
+#define tds_PIN HI_IO_NAME_GPIO_13            // tds计模拟输入引脚(根据实际接线调整)
+#define tds_ADC_CHANNEL  HI_ADC_CHANNEL_6
+#define kValue      1.0f                    // 修正系数,kValue=TDS_standard/TDS_messure
+
+#define temper_PIN    HI_IO_NAME_GPIO_7
+#define temper_GPIO_FUN   HI_IO_FUNC_GPIO_7_GPIO
 // IO引脚分配 基于ZK-5AD
 // 螺旋桨驱动电机
 #define MOTOR1_PWM         HI_PWM_PORT_PWM3
@@ -45,6 +57,7 @@ typedef enum {
 #define PUMP_IN2_GPIO_FUN    HI_IO_FUNC_GPIO_11_GPIO
 
 
+#ifdef L298N
 // IO引脚分配 基于L298N
 // 螺旋桨驱动电机
 #define ENA_PIN         HI_IO_NAME_GPIO_0
@@ -62,6 +75,6 @@ typedef enum {
 #define IN3_GPIO_FUN    HI_IO_FUNC_GPIO_5_GPIO
 #define IN4_PIN         HI_IO_NAME_GPIO_6
 #define IN4_GPIO_FUN    HI_IO_FUNC_GPIO_6_GPIO
-
+#endif
 
 #endif

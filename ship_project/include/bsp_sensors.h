@@ -1,35 +1,31 @@
 #include "hi_io.h"
 #include "hi_gpio.h"
 
-typedef struct sensors_msg
+#include "hi_adc.h"
+
+#include "ship_config.h"
+
+typedef struct 
 {
-    char *latstr;
-    char *lonstr;
-    hi_u8 battery;
-    hi_u8 waterstate;
-    double PH;
-    hi_u8 temp;
-    double turbidity;
-    hi_u8 powerswitch;
-    uint16_t tds;
-    hi_u8 cpu_temp;
-    hi_u8 temperature_DHT11;
-    hi_u8 humidity_DHT11;
-    double Pressure;
-    double H;
-    hi_u8 light;
+    float pH;        // PH 6.5-8.5
+    float temper;         // temp 0-50°
+    float tds;          // 0-500ppm,parts per million百万分比浓度 
+}sensors_data;
 
-};
+void Sensors_Task5(void);
+void Sensors_Task5_create(void);
+
+// adc
+float get_adc_voltage(hi_adc_channel_index adc_channel);
+uint16_t get_adc_value(hi_adc_channel_index adc_channel);
+
+//temperature
 
 
-typedef struct sensors_source
-{
-    double PH;        // PH 6.5-8.5
-    int temp;         // temp 0-50°
-    double turbidity; // 浊度 0-100NTU
-    int tds;          // 0-500ppm
-    int service;      // 0-100
-    hi_u8 greap;
-};
+// ph 
+float get_pH_value();
+void pH_init(void);
 
-void sensors_data_Task(void);
+//tds
+void tds_init(void);
+float get_tds_value(float temper, float K);

@@ -33,10 +33,9 @@ static void         set_motor_speed(motor_id motor,hi_s8 speed);
 static void         set_motor_logic_val(motor_id motor,hi_s8 speed);
 
 
-/// @brief 初始化L298N的控制引脚，设置初始PWM占空比50%
-/// @param 无
 void motor_init(void);
 
+#ifdef L298N
 
 /// @brief 设置左电机的转速和旋转方向
 /// @param speed 有符号速度，127级变速
@@ -46,13 +45,9 @@ void set_left_motor_speed(hi_s8 speed);
 /// @param speed 有符号速度，127级变速
 void set_right_motor_speed(hi_s8 speed);
 
-/**
- * @description: 初始化电机控制模块的引脚
- * @param {*}
- * @return {*}
- */
-void MOVE_Task(void);
-
 void motor_stop(void);
 
+#endif
+
+void MOVE_Task(void);
 void move_Task1_create(void);

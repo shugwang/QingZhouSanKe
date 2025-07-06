@@ -2,6 +2,8 @@
 #include "mqtt_task.h"
 #include "cmd_fifo.h"
 
+extern CMD_FIFO CMD_Q[CONSUMERS_NUM];
+
 osThreadId_t mqtt_send_Task3_id;   // mqtt订阅数据任务
 osThreadId_t mqtt_recv_Task4_id;   // mqtt发布数据任务
 
@@ -69,7 +71,7 @@ void mqtt_send_task(void)
     options.cb_mem = NULL;
     options.cb_size = 0;
     options.stack_mem = NULL;
-    options.stack_size = 1024*5;
+    options.stack_size = 1024*10;
     options.priority = osPriorityNormal;
 
     mqtt_recv_Task4_id = osThreadNew((osThreadFunc_t)mqtt_recv_task, NULL, &options);

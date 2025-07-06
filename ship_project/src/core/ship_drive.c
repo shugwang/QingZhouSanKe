@@ -303,6 +303,7 @@ static void set_motor_speed(motor_id motor,hi_s8 speed)
 }
 
 
+#ifdef L298N
 // L298N的控制函数
 
 void L298N_init()
@@ -398,8 +399,7 @@ void set_right_motor_speed(hi_s8 speed)
     printf("[info] pwm duty:[%u]\r\n", duty);
     hi_pwm_start(ENB_PWM,duty,PRESCALER);
 }
-
-
+#endif
 
 
 

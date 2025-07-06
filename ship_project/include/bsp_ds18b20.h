@@ -23,9 +23,11 @@
 #include "hi_io.h"
 #include "hi_gpio.h"
 
+#include "ship_config.h"
+
 //管脚定义
-#define DS18B20_PIN         HI_IO_NAME_GPIO_7
-#define DS18B20_GPIO_FUN    HI_IO_FUNC_GPIO_7_GPIO
+#define DS18B20_PIN         temper_PIN
+#define DS18B20_GPIO_FUN    temper_GPIO_FUN
 
 #define DS18B20_DQ_OUT(a)   hi_gpio_set_ouput_val(DS18B20_PIN,a)
 
