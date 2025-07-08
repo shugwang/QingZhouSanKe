@@ -6,21 +6,28 @@
 
 #include "bsp_ds18b20.h"
 #include "bsp_sensors.h"
+#include "navigation.h"
 
 //控制任务
 osThreadId_t Sensors_Task5_ID; //任务ID
+
+sensors_data data={
+    .pH=1.0f,
+    .tds=0.0f,
+    .temper=1.0f,
+
+    .x = 0,
+    .y = 0,
+    .z = 0
+};
 
 void Sensors_Task5(void)
 {
     static uint8_t i=0;
     float temper;
-    sensors_data data={
-        .pH=0.0f,
-        .tds=0.0f,
-        .temper=0.0f
-    };
-    
-
+    unsigned char uartReadBuff[UART_BUFF_SIZE] = {0};
+    int16_t x, y, z;
+    hi_u32 ret;
     while(ds18b20_init())
 	{
 		printf("DS18B20 init failed, check connection!\r\n");
@@ -30,23 +37,64 @@ void Sensors_Task5(void)
 
     pH_init();
     tds_init();
-
+    GPS_init();
+    
+    // 初始化HMC5883（连续测量模式）
+    while( HMC5883_I2C_Init() != HI_ERR_SUCCESS ){
+        printf("HMC5883_I2C_Init failed ret:%08X\r\n",HMC5883_I2C_Init());
+    }
+    HMC5883_WriteReg(0x00,0x70);//默认配置，8倍过采样，15Hz采样率
+    HMC5883_WriteReg(0x01,0x20);//默认增益+-1.3Ga
+    HMC5883_WriteReg(0x02,0x00);//连续测量
+    
     while (1) 
     {
         i++;
-        if(i%10==0)
+
+        if(i%5==0)
         {
             data.temper = ds18b20_gettemperture();
             printf("temperatur: %.3f degree\r\n",data.temper);
-
-			// data.pH     = get_pH_value();
-            // printf("PH值: %.3f\r\n",data.pH);
-
             data.tds    = get_tds_value(data.temper, kValue);
             printf("tds: %.3fppm\r\n",data.tds);
-        }
+            data.pH     = get_pH_value();
+            printf("PH: %.3f\r\n",data.pH);    
 
-        usleep(1000*1000); //1s
+
+            // if(uart_send_data(HI_UART_IDX_2,"uart_send_data is ok, i value",10)>0){
+            //     printf("uart_send_data: %d\r\n",i); 
+            // }else if(uart_send_data(HI_UART_IDX_2,"uart_send_data is ok, i value",sizeof("uart_send_data is ok, i value"))>0){
+            //     printf("uart_send_data is ok, i value: %d\r\n",i);
+            // }else{
+            //     printf("i value: %d\r\n",i);
+            // }
+        }
+        // if(i%10==0)
+        // {   
+        //     ret = HMC5883_ReadData(&x, &y, &z);
+        //     if( ret == HI_ERR_SUCCESS){
+        //         printf("x: %d, y: %d, z: %d\r\n", x, y, z);
+        //         data.x = x;
+        //         data.y = y;
+        //         data.z = z;
+        //     }else{
+        //         printf("read data ret not ok  :%08X\r\n",ret);
+        //         HMC5883_I2C_Init();
+        //         ret = HMC5883_WriteReg(0x02,0x00);
+        //         if(ret ==HI_ERR_SUCCESS)//连续测量
+        //         {
+        //             printf("write 02 00 ok");
+        //         }else{
+        //             printf("write data 02 00 ret not ok:%08X\r\n",ret);
+        //             ret = HMC5883_WriteReg(0xAA,0x55);
+        //             printf("write data AA 55 ret:%08X\r\n",ret);
+        //         }
+        //     }
+            
+            // GPS_get_data(uartReadBuff);
+        // }
+
+        usleep(SENSOR_TASK_GAP); //1s
     }
 }
 
@@ -121,7 +169,7 @@ void pH_init(void)
     hi_io_set_pull(pH_PIN, HI_IO_PULL_UP);                   // 设置GPIO上拉
 }
 
-float get_pH_value()
+float get_pH_value(void)
 {
     float buf[10];                // 模拟量读取缓冲区
     

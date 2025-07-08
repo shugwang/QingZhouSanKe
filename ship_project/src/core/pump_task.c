@@ -7,6 +7,7 @@ osThreadId_t pump_Task2_ID;
 extern CMD_FIFO CMD_Q[CONSUMERS_NUM];
 #else
 extern osMessageQueueId_t MsgQueue_ID1;
+extern int8_t mqtt_sub_payload_callback(unsigned char *topic, unsigned char *payload);
 #endif
 
 void pump_Task(void)
@@ -35,9 +36,34 @@ void pump_Task(void)
                 printf(" stop pump\r\n ");
                 stop_pump();
             }
+            else if( cmd.func_id == 0x04 ){
+                printf(" pump water %d seconds\r\n ",cmd.data_1);
+                pump_water();
+                sleep((unsigned char)(cmd.data_2));
+                stop_pump();
+            }
+            else if( cmd.func_id == 0x05 ){
+                printf(" drain water %d seconds\r\n ",cmd.data_2);
+                drain_water();
+                sleep((unsigned char)(cmd.data_2));
+                stop_pump();
+            }
+            else if( cmd.func_id == 0x06 ){
+                printf(" pump water %d seconds\r\n ",cmd.data_1);
+                pump_water();
+                sleep((unsigned char)(cmd.data_1));
+                stop_pump();
+
+                mqtt_sub_payload_callback("pump task: fun 6", "2 1 0 0");
+
+                printf(" drain water %d seconds\r\n ",cmd.data_2);
+                drain_water();
+                sleep((unsigned char)(cmd.data_2));
+                stop_pump();
+            }
         }
 
-        usleep(1000*1000);
+        usleep(PUMP_TASK_GAP); //
     }
 }
 

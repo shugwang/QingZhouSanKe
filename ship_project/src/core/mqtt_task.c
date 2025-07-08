@@ -13,13 +13,17 @@ osThreadId_t mqtt_recv_Task4_id;   // mqtt发布数据任务
 
 extern int8_t mqtt_sub_payload_callback(unsigned char *topic, unsigned char *payload);
 
+#include "bsp_sensors.h"
+extern sensors_data data;
+char sensors_data_pub_buff[200];
+
 void mqtt_recv_task(void)
 {
 
     while (1) 
     {
         MQTTClient_sub();
-        usleep(MQTT_RECV_TASK_TIME);
+        usleep(RECV_TASK_GAP);
     }
 }
 
@@ -42,12 +46,12 @@ void mqtt_send_task(void)
     } 
     else 
     {
-        printf("[success] MQTTClient_connectServer\r\n");
+        printf("[success] MQTTClient_connectServer %s:%d \r\n",SERVER_IP_ADDR,SERVER_IP_PORT);
     }
     sleep(TASK_INIT_TIME);
 
     // 初始化MQTT客户端
-    if (MQTTClient_init("mqtt_client_123", "username", "password") != 0) 
+    if (MQTTClient_init("mqtt_client_123",USERNAME , PASSWORD) != 0) 
     {
         printf("[error] MQTTClient_init\r\n");
     } 
@@ -76,7 +80,7 @@ void mqtt_send_task(void)
     options.cb_size = 0;
     options.stack_mem = NULL;
     options.stack_size = 1024*10;
-    options.priority = osPriorityNormal;
+    options.priority = osPriorityAboveNormal;
 
     mqtt_recv_Task4_id = osThreadNew((osThreadFunc_t)mqtt_recv_task, NULL, &options);
     if (mqtt_recv_Task4_id != NULL) 
@@ -101,10 +105,30 @@ void mqtt_send_task(void)
         #endif
             printf("mqtt_pub_task pop cmd: %x %x %x %x \r\n",cmd.task_id, cmd.func_id, cmd.data_1, cmd.data_2 );
             if( cmd.func_id == 0x01){ //上传传感器信息
-                MQTTClient_pub(MQTT_TOPIC_PUB, "hello world!!!", strlen("hello world!!!"));
+                int ret = snprintf(sensors_data_pub_buff, sizeof(sensors_data_pub_buff),
+                    "{\"pH\":%.3f,\"oxygen\":%d,\"turbidity\":%d,\"temperature\":%.3f,\"conductivity\":%.3f}",
+                    data.pH, 0, 0, data.temper, data.tds);
+                
+                if (ret < 0) {
+                    // 格式化错误
+                    printf("MQTT_TOPIC_PUB snprintf error.");
+                }else{
+                    MQTTClient_pub(MQTT_TOPIC_PUB, (unsigned char *)sensors_data_pub_buff, ret);
+                }
+                
             }
         }
-        usleep(1000*1000);
+        int ret = snprintf(sensors_data_pub_buff, sizeof(sensors_data_pub_buff),
+            "{\"x\":%d,\"y\":%d,\"z\":%d}",
+            data.x, data.y, data.z);
+        
+        if (ret < 0) {
+            // 格式化错误
+            printf("MQTT_TOPIC_PUB snprintf error.");
+        }else{
+            MQTTClient_pub("navigationTopic", (unsigned char *)sensors_data_pub_buff, ret);
+        }
+        usleep(SEND_TASK_GAP);
     }
 }
 
@@ -119,7 +143,7 @@ void wifi_mqtt_send_Task3_create(void)
     taskOptions.cb_size = 0;                 // 堆空间大小
     taskOptions.stack_mem = NULL;            // 栈空间地址
     taskOptions.stack_size = 1024*5;           // 栈空间大小 单位:字节
-    taskOptions.priority = osPriorityNormal; // 任务的优先级
+    taskOptions.priority = osPriorityAboveNormal; // 任务的优先级
 
     mqtt_send_Task3_id = osThreadNew((osThreadFunc_t)mqtt_send_task, NULL, &taskOptions); // 创建任务
     if (mqtt_send_Task3_id != NULL)

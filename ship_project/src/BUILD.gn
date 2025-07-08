@@ -20,6 +20,9 @@ static_library("ship_source_code") {
         "./core/ship_drive.c",
         "./core/pump_task.c",
         "./core/cmd_fifo.c",
+        "./core/uart_fun.c",
+        "./core/gps_module.c",
+        "./core/HMC5883.c",
 
         "./BSP/bsp_wifi.c",
         "./BSP/bsp_mqtt.c",

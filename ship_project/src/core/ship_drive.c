@@ -47,7 +47,7 @@ void MOVE_Task(void)
 
         }
         
-        usleep(1000*1000);
+        usleep(DRIVE_TASK_GAP);
     }
 }
 
