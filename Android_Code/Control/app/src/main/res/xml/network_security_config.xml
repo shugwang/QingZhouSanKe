@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- 允许明文通信（用于调试） -->
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- 针对特定域名的配置（可选） -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">47.111.93.229</domain>  <!-- 你的MQTT服务器地址 -->
+    </domain-config>
+</network-security-config>
