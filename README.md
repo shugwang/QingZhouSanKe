@@ -4,7 +4,9 @@
 无人水质监测船的嵌入式软件代码
 
 运行平台：海思Hi-3861
+
 编译平台：DevEco Device Tool
+
 编译套件：DevTools_Hi3861V100_v1.0
 
 2. andriod_code
