@@ -26,7 +26,7 @@ typedef enum {
 #define WIFI_SSID "Xiami 13"
 #define WIFI_PAWD "12345678"
 
-#define SERVER_IP_ADDR "47.111.93.229"    //broker.emqx.io
+#define SERVER_IP_ADDR "39.96.166.193"    //broker.emqx.io
 #define SERVER_IP_PORT 1883
 #define USERNAME "123"
 #define PASSWORD "123"
